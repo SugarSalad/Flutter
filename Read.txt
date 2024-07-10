@@ -1,0 +1,22 @@
+utils.dart
+
+TextStyle getThemeAwareTextStyle(
+    BuildContext context, TextStyle? providedStyle) {
+  final defaultTextStyle = DefaultTextStyle.of(context);
+  var effectiveTextStyle = providedStyle;
+  if (providedStyle == null || providedStyle.inherit) {
+    effectiveTextStyle = defaultTextStyle.style.merge(providedStyle);
+  }
+  
+  // Check if the user's accessibility settings require bold text
+  final boldTextEnabled = MediaQuery.of(context).boldText;
+  if (boldTextEnabled) {
+    effectiveTextStyle = effectiveTextStyle!.merge(const TextStyle(fontWeight: FontWeight.bold));
+  }
+  
+  return effectiveTextStyle ?? defaultTextStyle.style;
+}
+
+
+run the pubspec.yaml
+
