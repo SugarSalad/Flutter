@@ -7,7 +7,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.4.3 <4.0.0'
+  sdk: ">=2.17.2 <3.0.0"
 
 dependencies:
   flutter:
@@ -15,16 +15,19 @@ dependencies:
   flutter_staggered_grid_view: ^0.4.0
   cupertino_icons: ^1.0.6
   intl: ^0.17.0 
-  shared_preferences: ^2.0.15
+  shared_preferences: ^2.0.7
   charts_flutter: ^0.12.0
   fl_chart: ^0.40.0
   syncfusion_flutter_charts: ^19.3.56
-  sqflite: ^2.0.0+4
-  path: ^1.8.3
+  hive: ^2.0.5
+  hive_flutter: ^1.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  hive_generator: ^1.1.1
+  build_runner: ^2.0.6
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
