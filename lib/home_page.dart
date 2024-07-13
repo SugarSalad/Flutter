@@ -137,32 +137,19 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                     ),
                     getTitles: (value) {
                       switch (value.toInt()) {
-                        case 0:
-                          return 'Jan';
-                        case 1:
-                          return 'Feb';
-                        case 2:
-                          return 'Mar';
-                        case 3:
-                          return 'Apr';
-                        case 4:
-                          return 'May';
-                        case 5:
-                          return 'Jun';
-                        case 6:
-                          return 'Jul';
-                        case 7:
-                          return 'Aug';
-                        case 8:
-                          return 'Sep';
-                        case 9:
-                          return 'Oct';
-                        case 10:
-                          return 'Nov';
-                        case 11:
-                          return 'Dec';
-                        default:
-                          return '';
+                        case 0: return 'Jan';
+                        case 1: return 'Feb';
+                        case 2: return 'Mar';
+                        case 3: return 'Apr';
+                        case 4: return 'May';
+                        case 5: return 'Jun';
+                        case 6: return 'Jul';
+                        case 7: return 'Aug';
+                        case 8: return 'Sep';
+                        case 9: return 'Oct';
+                        case 10: return 'Nov';
+                        case 11: return 'Dec';
+                        default: return '';
                       }
                     },
                   ),
@@ -376,7 +363,18 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
             ),
             TextButton(
               onPressed: () {
-                _addExpense(selectedExpenseTitle!, double.tryParse(amountController.text) ?? 0.0, selectedDate);
+                if (selectedExpenseTitle == null || amountController.text.isEmpty) {
+                  _showErrorDialog(context, 'Please fill in all fields.');
+                  return;
+                }
+
+                double? amount = double.tryParse(amountController.text);
+                if (amount == null || amount <= 0) {
+                  _showErrorDialog(context, 'Please enter a valid amount.');
+                  return;
+                }
+
+                _addExpense(selectedExpenseTitle!, amount, selectedDate);
                 amountController.clear();
                 selectedDate = DateTime.now();
                 selectedExpenseTitle = null;
@@ -398,6 +396,24 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     );
     _expenseBox.add(expense);
     _fetchExpenses();
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Input Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
