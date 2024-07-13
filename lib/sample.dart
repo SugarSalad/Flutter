@@ -138,125 +138,108 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     );
   }
 
-Widget _buildHomeTab() {
-  List<double> monthlyExpenses = List.filled(12, 0.0);
+  Widget _buildHomeTab() {
+    List<double> monthlyExpenses = List.filled(12, 0.0);
 
-  for (var expense in _expenses) {
-    int month = expense.date.month;
-    monthlyExpenses[month - 1] += expense.amount;
-  }
+    for (var expense in _expenses) {
+      int month = expense.date.month;
+      monthlyExpenses[month - 1] += expense.amount;
+    }
 
-  String formattedTotalAmount = NumberFormat.currency(
-    locale: 'en_PH',
-    symbol: '₱',
-  ).format(_totalMonthlyAmount);
+    String formattedTotalAmount = NumberFormat.currency(
+      locale: 'en_PH',
+      symbol: '₱',
+    ).format(_totalMonthlyAmount);
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          'Total Expenses this month: $formattedTotalAmount',
-          style: const TextStyle(
-            fontSize: 24,
-            fontFamily: 'BebasNeue',
-          ),
-        ),
-      ),
-      Expanded(
-        child: Padding(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
           padding: const EdgeInsets.all(8.0),
-          child: BarChart(
-            BarChartData(
-              alignment: BarChartAlignment.spaceAround,
-              maxY: monthlyExpenses.reduce((value, element) => value > element ? value : element) * 1.5,
-              gridData: FlGridData(show: false),
-              titlesData: FlTitlesData(
-                bottomTitles: SideTitles(
-                  showTitles: true,
-                  getTextStyles: (context, value) => const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                  getTitles: (value) {
-                    switch (value.toInt()) {
-                      case 0:
-                        return 'Jan';
-                      case 1:
-                        return 'Feb';
-                      case 2:
-                        return 'Mar';
-                      case 3:
-                        return 'Apr';
-                      case 4:
-                        return 'May';
-                      case 5:
-                        return 'Jun';
-                      case 6:
-                        return 'Jul';
-                      case 7:
-                        return 'Aug';
-                      case 8:
-                        return 'Sep';
-                      case 9:
-                        return 'Oct';
-                      case 10:
-                        return 'Nov';
-                      case 11:
-                        return 'Dec';
-                      default:
-                        return '';
-                    }
-                  },
-                ),
-                leftTitles: SideTitles(
-                  showTitles: true,
-                  getTextStyles: (context, value) => const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                  getTitles: (value) {
-                    // Format the left axis labels with peso sign and currency format
-                    return '₱${NumberFormat.decimalPattern().format(value)}';
-                  },
-                  reservedSize: 30,
-                ),
-                topTitles: SideTitles(showTitles: false),
-              ),
-              borderData: FlBorderData(
-                show: true,
-                border: Border.all(color: Colors.black),
-              ),
-              barGroups: _generateBars(monthlyExpenses),
+          child: Text(
+            'Total Expenses this month: $formattedTotalAmount',
+            style: const TextStyle(
+              fontSize: 24,
+              fontFamily: 'BebasNeue',
             ),
           ),
         ),
-      ),
-    ],
-  );
-}
-
-
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: BarChart(
+              BarChartData(
+                alignment: BarChartAlignment.spaceAround,
+                maxY: monthlyExpenses.reduce((value, element) => value > element ? value : element) * 1.5,
+                gridData: FlGridData(show: false),
+                titlesData: FlTitlesData(
+                  bottomTitles: SideTitles(
+                    showTitles: true,
+                    getTextStyles: (context, value) => const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    getTitles: (value) {
+                      switch (value.toInt()) {
+                        case 0:
+                          return 'Jan';
+                        case 1:
+                          return 'Feb';
+                        case 2:
+                          return 'Mar';
+                        case 3:
+                          return 'Apr';
+                        case 4:
+                          return 'May';
+                        case 5:
+                          return 'Jun';
+                        case 6:
+                          return 'Jul';
+                        case 7:
+                          return 'Aug';
+                        case 8:
+                          return 'Sep';
+                        case 9:
+                          return 'Oct';
+                        case 10:
+                          return 'Nov';
+                        case 11:
+                          return 'Dec';
+                        default:
+                          return '';
+                      }
+                    },
+                  ),
+                  leftTitles: SideTitles(
+                    showTitles: true,
+                    getTextStyles: (context, value) => const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    getTitles: (value) {
+                      // Format the left axis labels with peso sign and currency format
+                      return '₱${NumberFormat.decimalPattern().format(value)}';
+                    },
+                    reservedSize: 30,
+                  ),
+                  topTitles: SideTitles(showTitles: false),
+                ),
+                borderData: FlBorderData(
+                  show: true,
+                  border: Border.all(color: Colors.black),
+                ),
+                barGroups: _generateBars(monthlyExpenses),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
   List<BarChartGroupData> _generateBars(List<double> monthlyExpenses) {
-    List<Color> barColors = [
-      Colors.red,
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.purple,
-      Colors.yellow,
-      Colors.teal,
-      Colors.pink,
-      Colors.cyan,
-      Colors.indigo,
-      Colors.brown,
-      Colors.deepOrange,
-    ];
-
     List<BarChartGroupData> bars = [];
 
     for (int i = 0; i < 12; i++) {
@@ -266,7 +249,7 @@ Widget _buildHomeTab() {
           barRods: [
             BarChartRodData(
               y: monthlyExpenses[i],
-              colors: [barColors[i % barColors.length]], // Assigning color based on index
+              colors: [Colors.green], // Use green color for bars
               width: 30,
             ),
           ],
@@ -357,116 +340,113 @@ Widget _buildHomeTab() {
     }
   }
 
-Future<void> _showExpenseEntryDialog(BuildContext context) async {
-  TextEditingController amountController = TextEditingController();
-  DateTime selectedDate = DateTime.now(); // Default to current date
+  Future<void> _showExpenseEntryDialog(BuildContext context) async {
+    TextEditingController amountController = TextEditingController();
+    DateTime selectedDate = DateTime.now(); // Default to current date
 
-  await showDialog(
-    context: context,
-    builder: (context) => StatefulBuilder(
-      builder: (context, setState) => AlertDialog(
-        title: const Text('Add Expense'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            DropdownButtonFormField<String>(
-              value: selectedExpenseTitle,
-              onChanged: (value) {
-                setState(() {
-                  selectedExpenseTitle = value;
-                });
-              },
-              items: expenseTitles.map((String title) {
-                return DropdownMenuItem<String>(
-                  value: title,
-                  child: Text(title),
-                );
-              }).toList(),
-              decoration: const InputDecoration(
-                labelText: 'Expenses',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'Amount',
-                prefixText: '₱', // Add pesos sign as prefix
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            InkWell(
-              onTap: () async {
-                final DateTime? pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: selectedDate,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime.now(),
-                );
-                if (pickedDate != null && pickedDate != selectedDate) {
+    await showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Add Expense'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DropdownButtonFormField<String>(
+                value: selectedExpenseTitle,
+                onChanged: (value) {
                   setState(() {
-                    selectedDate = pickedDate;
+                    selectedExpenseTitle = value;
                   });
-                }
-              },
-              child: Container(
-                height: 50,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                alignment: Alignment.centerLeft,
-                child: Row(
-                  children: [
-                    const Icon(Icons.calendar_today), // Calendar icon
-                    const SizedBox(width: 10),
-                    Text(DateFormat('dd-MM-yyyy').format(selectedDate)),
-                  ],
+                },
+                items: expenseTitles.map((String title) {
+                  return DropdownMenuItem<String>(
+                    value: title,
+                    child: Text(title),
+                  );
+                }).toList(),
+                decoration: const InputDecoration(
+                  labelText: 'Expenses',
+                  border: OutlineInputBorder(),
                 ),
               ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: amountController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  labelText: 'Amount',
+                  prefixText: '₱', // Add pesos sign as prefix
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              InkWell(
+                onTap: () async {
+                  final DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                  );
+                  if (pickedDate != null && pickedDate != selectedDate) {
+                    setState(() {
+                      selectedDate = pickedDate;
+                    });
+                  }
+                },
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_today), // Calendar icon
+                      const SizedBox(width: 10),
+                      Text(DateFormat('dd-MM-yyyy').format(selectedDate)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _addExpense(selectedExpenseTitle!, double.tryParse(amountController.text) ?? 0.0, selectedDate);
+                amountController.clear(); // Clear the amount field
+                selectedDate = DateTime.now(); // Reset selected date to current date
+                selectedExpenseTitle = null; // Reset dropdown value
+                Navigator.of(context).pop();
+              },
+              child: const Text('Add'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              _addExpense(selectedExpenseTitle!, double.tryParse(amountController.text) ?? 0.0, selectedDate);
-              amountController.clear(); // Clear the amount field
-              selectedDate = DateTime.now(); // Reset selected date to current date
-              selectedExpenseTitle = null; // Reset dropdown value
-              Navigator.of(context).pop();
-            },
-            child: const Text('Add'),
-          ),
-        ],
       ),
-    ),
-  );
-}
+    );
+  }
 
-void _addExpense(String title, double amount, DateTime date) {
-  final expense = Expense(
-    title: title,
-    amount: amount,
-    date: date,
-  );
-  _expenseBox.add(expense);
-  _fetchExpenses(); // Update the list after addition
-}
-
-
-
+  void _addExpense(String title, double amount, DateTime date) {
+    final expense = Expense(
+      title: title,
+      amount: amount,
+      date: date,
+    );
+    _expenseBox.add(expense);
+    _fetchExpenses(); // Update the list after addition
+  }
 
   @override
   void dispose() {
@@ -474,8 +454,6 @@ void _addExpense(String title, double amount, DateTime date) {
     super.dispose();
   }
 }
-
-
 
 @HiveType(typeId: 0)
 class Expense {
@@ -500,8 +478,6 @@ class Expense {
     key = DateTime.now().millisecondsSinceEpoch;
   }
 }
-
-
 
 class ExpenseAdapter extends TypeAdapter<Expense> {
   @override

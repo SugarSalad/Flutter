@@ -18,5 +18,9 @@ TextStyle getThemeAwareTextStyle(
 }
 
 
-run the pubspec.yaml
+-run the pubspec.yaml
+
+
+-flutter packages pub run build_runner build
+
 
