@@ -137,121 +137,123 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   Widget _buildHomeTab() {
-    List<double> monthlyExpenses = List.filled(12, 0.0);
+  List<double> monthlyExpenses = List.filled(12, 0.0);
 
-    for (var expense in _expenses) {
-      int month = expense.date.month;
-      monthlyExpenses[month - 1] += expense.amount;
-    }
-
-    String formattedTotalMonthlyAmount = NumberFormat.currency(
-      locale: 'en_PH',
-      symbol: '₱',
-    ).format(_totalMonthlyAmount);
-
-    String formattedTotalYearlyAmount = NumberFormat.currency(
-      locale: 'en_PH',
-      symbol: '₱',
-    ).format(_totalYearlyAmount);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            'Total Expenses this month: $formattedTotalMonthlyAmount',
-            style: const TextStyle(
-              fontSize: 24,
-              fontFamily: 'BebasNeue',
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            'Total Expenses this year: $formattedTotalYearlyAmount',
-            style: const TextStyle(
-              fontSize: 24,
-              fontFamily: 'BebasNeue',
-            ),
-          ),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceAround,
-                maxY: monthlyExpenses.reduce((value, element) =>
-                    value > element ? value : element) *
-                    1.5,
-                gridData: FlGridData(show: false),
-                titlesData: FlTitlesData(
-                  bottomTitles: SideTitles(
-                    showTitles: true,
-                    getTextStyles: (context, value) => const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                    getTitles: (value) {
-                      switch (value.toInt()) {
-                        case 0:
-                          return 'Jan';
-                        case 1:
-                          return 'Feb';
-                        case 2:
-                          return 'Mar';
-                        case 3:
-                          return 'Apr';
-                        case 4:
-                          return 'May';
-                        case 5:
-                          return 'Jun';
-                        case 6:
-                          return 'Jul';
-                        case 7:
-                          return 'Aug';
-                        case 8:
-                          return 'Sep';
-                        case 9:
-                          return 'Oct';
-                        case 10:
-                          return 'Nov';
-                        case 11:
-                          return 'Dec';
-                        default:
-                          return '';
-                      }
-                    },
-                  ),
-                  leftTitles: SideTitles(
-                    showTitles: true,
-                    getTextStyles: (context, value) => const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                    getTitles: (value) {
-                      return '₱${NumberFormat.decimalPattern().format(value)}';
-                    },
-                    reservedSize: 30,
-                  ),
-                  topTitles: SideTitles(showTitles: false),
-                ),
-                borderData: FlBorderData(
-                  show: true,
-                  border: Border.all(color: Colors.black),
-                ),
-                barGroups: _generateBars(monthlyExpenses),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+  for (var expense in _expenses) {
+    int month = expense.date.month;
+    monthlyExpenses[month - 1] += expense.amount;
   }
+
+  String formattedTotalMonthlyAmount = NumberFormat.currency(
+    locale: 'en_PH',
+    symbol: '₱',
+  ).format(_totalMonthlyAmount);
+
+  String formattedTotalYearlyAmount = NumberFormat.currency(
+    locale: 'en_PH',
+    symbol: '₱',
+  ).format(_totalYearlyAmount);
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          'Total Expenses this month: $formattedTotalMonthlyAmount',
+          style: const TextStyle(
+            fontSize: 24,
+            fontFamily: 'BebasNeue',
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          'Total Expenses this year: $formattedTotalYearlyAmount',
+          style: const TextStyle(
+            fontSize: 24,
+            fontFamily: 'BebasNeue',
+          ),
+        ),
+      ),
+      Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: BarChart(
+            BarChartData(
+              alignment: BarChartAlignment.spaceAround,
+              maxY: monthlyExpenses.reduce((value, element) =>
+                  value > element ? value : element) *
+                  1.5,
+              gridData: FlGridData(show: false),
+              titlesData: FlTitlesData(
+                bottomTitles: SideTitles(
+                  showTitles: true,
+                  getTextStyles: (context, value) => TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                  getTitles: (value) {
+                    switch (value.toInt()) {
+                      case 0:
+                        return 'Jan';
+                      case 1:
+                        return 'Feb';
+                      case 2:
+                        return 'Mar';
+                      case 3:
+                        return 'Apr';
+                      case 4:
+                        return 'May';
+                      case 5:
+                        return 'Jun';
+                      case 6:
+                        return 'Jul';
+                      case 7:
+                        return 'Aug';
+                      case 8:
+                        return 'Sep';
+                      case 9:
+                        return 'Oct';
+                      case 10:
+                        return 'Nov';
+                      case 11:
+                        return 'Dec';
+                      default:
+                        return '';
+                    }
+                  },
+                ),
+                leftTitles: SideTitles(
+                  showTitles: true,
+                  getTextStyles: (context, value) => TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                  getTitles: (value) {
+                    return '₱${NumberFormat.decimalPattern().format(value)}';
+                  },
+                  reservedSize: 30,
+                ),
+                topTitles: SideTitles(showTitles: false),
+              ),
+              borderData: FlBorderData(
+                show: true,
+                border: Border.all(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+              barGroups: _generateBars(monthlyExpenses),
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+}
 
   List<BarChartGroupData> _generateBars(List<double> monthlyExpenses) {
     List<BarChartGroupData> bars = [];
