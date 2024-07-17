@@ -73,68 +73,69 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false, // Add this line to hide debug banner
-      theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Budget Buddy',
-    style: TextStyle(
-      color: isDarkMode ? const Color.fromARGB(255, 0, 0, 0) : Colors.black,
-    ),
-  ),
-  backgroundColor: Colors.green[100],
-  actions: [
-    IconButton(
-      onPressed: () {
-        setState(() {
-          isDarkMode = !isDarkMode;
-        });
-      },
-      icon: Icon(
-        isDarkMode ? Icons.light_mode : Icons.dark_mode,
-        color: isDarkMode ? const Color.fromARGB(255, 0, 0, 0) : Colors.black,
+  return MaterialApp(
+    debugShowCheckedModeBanner: false,
+    theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
+    home: Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Budget Buddy',
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        backgroundColor: isDarkMode ? Colors.green[900] : Colors.green[100],
+        actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                isDarkMode = !isDarkMode;
+              });
+            },
+            icon: Icon(
+              isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+        ],
       ),
-    ),
-  ],
-),
-        body: Column(
-          children: [
-            TabBar(
+      body: Column(
+        children: [
+          TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(icon: Icon(Icons.home), text: 'Home'),
+              Tab(icon: Icon(Icons.attach_money), text: 'Expenses'),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
               controller: _tabController,
-              tabs: const [
-                Tab(icon: Icon(Icons.home), text: 'Home'),
-                Tab(icon: Icon(Icons.attach_money), text: 'Expenses'),
+              children: [
+                _buildHomeTab(),
+                _buildExpensesTab(),
               ],
             ),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildHomeTab(),
-                  _buildExpensesTab(),
-                ],
-              ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: isDarkMode ? Colors.green[900] : Colors.green[100],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                _showExpenseEntryDialog(context);
+              },
+              child: const Text('Add Expense'),
             ),
           ],
         ),
-        bottomNavigationBar: BottomAppBar(
-          color: Colors.green[100],
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  _showExpenseEntryDialog(context);
-                },
-                child: const Text('Add Expense'),
-              ),
-            ],
-          ),
-        ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildHomeTab() {
   List<double> monthlyExpenses = List.filled(12, 0.0);
