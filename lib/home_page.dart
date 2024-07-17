@@ -137,6 +137,7 @@ class _MyHomePageState extends State<MyHomePage>
   );
 }
 
+
   Widget _buildHomeTab() {
   List<double> monthlyExpenses = List.filled(12, 0.0);
 
@@ -361,13 +362,15 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   Future<void> _showExpenseEntryDialog(BuildContext context) async {
-    TextEditingController amountController = TextEditingController();
-    DateTime selectedDate = DateTime.now();
+  TextEditingController amountController = TextEditingController();
+  DateTime selectedDate = DateTime.now();
 
-    await showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return Theme(
+        data: isDarkMode ? ThemeData.dark() : ThemeData.light(),
+        child: AlertDialog(
           title: const Text('Add Expense'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -383,26 +386,44 @@ class _MyHomePageState extends State<MyHomePage>
                 items: expenseTitles.map((String title) {
                   return DropdownMenuItem<String>(
                     value: title,
-                    child: Text(title),
+                    child: Text(
+                      title,
+                      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                    ),
                   );
                 }).toList(),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Expenses',
+                  labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                   border: OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: isDarkMode ? Colors.white : Colors.black),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: isDarkMode ? Colors.white : Colors.black),
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               TextField(
                 controller: amountController,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                decoration: InputDecoration(
                   labelText: 'Amount',
                   prefixText: '₱',
+                  labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                  prefixStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                   border: OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: isDarkMode ? Colors.white : Colors.black),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: isDarkMode ? Colors.white : Colors.black),
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               InkWell(
                 onTap: () async {
                   final DateTime? pickedDate = await showDatePicker(
@@ -410,6 +431,12 @@ class _MyHomePageState extends State<MyHomePage>
                     initialDate: selectedDate,
                     firstDate: DateTime(2000),
                     lastDate: DateTime.now(),
+                    builder: (BuildContext context, Widget? child) {
+                      return Theme(
+                        data: isDarkMode ? ThemeData.dark() : ThemeData.light(),
+                        child: child!,
+                      );
+                    },
                   );
                   if (pickedDate != null && pickedDate != selectedDate) {
                     setState(() {
@@ -420,16 +447,19 @@ class _MyHomePageState extends State<MyHomePage>
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
+                    border: Border.all(color: isDarkMode ? Colors.white : Colors.black),
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 12),
                   alignment: Alignment.centerLeft,
                   child: Row(
                     children: [
-                      const Icon(Icons.calendar_today),
-                      const SizedBox(width: 10),
-                      Text(DateFormat('dd-MM-yyyy').format(selectedDate)),
+                      Icon(Icons.calendar_today, color: isDarkMode ? Colors.white : Colors.black),
+                      SizedBox(width: 10),
+                      Text(
+                        DateFormat('dd-MM-yyyy').format(selectedDate),
+                        style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                      ),
                     ],
                   ),
                 ),
@@ -441,12 +471,11 @@ class _MyHomePageState extends State<MyHomePage>
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text('Cancel', style: TextStyle(color: isDarkMode ? Colors.white : Colors.black)),
             ),
             TextButton(
               onPressed: () {
-                if (selectedExpenseTitle == null ||
-                    amountController.text.isEmpty) {
+                if (selectedExpenseTitle == null || amountController.text.isEmpty) {
                   _showErrorDialog(context, 'Please fill in all fields.');
                   return;
                 }
@@ -463,13 +492,14 @@ class _MyHomePageState extends State<MyHomePage>
                 selectedExpenseTitle = null;
                 Navigator.of(context).pop();
               },
-              child: const Text('Add'),
+              child: Text('Add', style: TextStyle(color: isDarkMode ? Colors.white : Colors.black)),
             ),
           ],
         ),
-      ),
-    );
-  }
+      );
+    },
+  );
+}
 
   void _addExpense(String title, double amount, DateTime date) {
     final expense = Expense(
@@ -481,12 +511,14 @@ class _MyHomePageState extends State<MyHomePage>
     _fetchExpenses();
   }
 
-  void _showErrorDialog(BuildContext context, String message) {
+ void _showErrorDialog(BuildContext context, String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => Theme(
+      data: isDarkMode ? ThemeData.dark() : ThemeData.light(),
+      child: AlertDialog(
         title: const Text('Input Error'),
-        content: Text(message),
+        content: Text(message, style: TextStyle(color: isDarkMode ? Colors.white : Colors.black)),
         actions: [
           TextButton(
             onPressed: () {
@@ -495,6 +527,7 @@ class _MyHomePageState extends State<MyHomePage>
             child: const Text('OK'),
           ),
         ],
+      ),
       ),
     );
   }
