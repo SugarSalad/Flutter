@@ -5,17 +5,20 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'expense.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late Box<Expense> _expenseBox;
   List<Expense> _expenses = [];
   double _totalMonthlyAmount = 0.0;
+  double _totalYearlyAmount = 0.0;
+  double _totalExpensesAmount = 0.0;
 
   List<String> expenseTitles = [
     'Food',
@@ -31,6 +34,8 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
 
   String? selectedExpenseTitle;
 
+  bool isDarkMode = false; // Default to light mode
+
   @override
   void initState() {
     super.initState();
@@ -45,59 +50,89 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
 
     // Filter for current month and year
     final monthlyExpenses = expenses.where((expense) =>
-      expense.date.year == now.year && expense.date.month == now.month
-    ).toList();
+        expense.date.year == now.year && expense.date.month == now.month).toList();
 
-    double totalAmount = monthlyExpenses.fold(0, (sum, item) => sum + item.amount);
-    
+    // Filter for current year
+    final yearlyExpenses =
+        expenses.where((expense) => expense.date.year == now.year).toList();
+
+    double totalMonthlyAmount =
+        monthlyExpenses.fold(0, (sum, item) => sum + item.amount);
+    double totalYearlyAmount =
+        yearlyExpenses.fold(0, (sum, item) => sum + item.amount);
+    double totalExpensesAmount =
+        expenses.fold(0, (sum, item) => sum + item.amount);
+
     setState(() {
       _expenses = expenses;
-      _totalMonthlyAmount = totalAmount; // Total for the current month
+      _totalMonthlyAmount = totalMonthlyAmount; // Total for the current month
+      _totalYearlyAmount = totalYearlyAmount; // Total for the current year
+      _totalExpensesAmount = totalExpensesAmount; // Total expenses
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Budget Buddy'),
-        backgroundColor: Colors.green[100],
+    return MaterialApp(
+      debugShowCheckedModeBanner: false, // Add this line to hide debug banner
+      theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Budget Buddy',
+    style: TextStyle(
+      color: isDarkMode ? const Color.fromARGB(255, 0, 0, 0) : Colors.black,
+    ),
+  ),
+  backgroundColor: Colors.green[100],
+  actions: [
+    IconButton(
+      onPressed: () {
+        setState(() {
+          isDarkMode = !isDarkMode;
+        });
+      },
+      icon: Icon(
+        isDarkMode ? Icons.light_mode : Icons.dark_mode,
+        color: isDarkMode ? const Color.fromARGB(255, 0, 0, 0) : Colors.black,
       ),
-      body: Column(
-        children: [
-          TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(icon: Icon(Icons.home), text: 'Home'),
-              Tab(icon: Icon(Icons.attach_money), text: 'Expenses'),
-            ],
-          ),
-          Expanded(
-            child: TabBarView(
+    ),
+  ],
+),
+        body: Column(
+          children: [
+            TabBar(
               controller: _tabController,
-              children: [
-                _buildHomeTab(),
-                _buildExpensesTab(),
+              tabs: const [
+                Tab(icon: Icon(Icons.home), text: 'Home'),
+                Tab(icon: Icon(Icons.attach_money), text: 'Expenses'),
               ],
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.green[100],
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                _showExpenseEntryDialog(context);
-              },
-              child: const Text('Add Expense'),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildHomeTab(),
+                  _buildExpensesTab(),
+                ],
+              ),
             ),
           ],
         ),
+        bottomNavigationBar: BottomAppBar(
+          color: Colors.green[100],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  _showExpenseEntryDialog(context);
+                },
+                child: const Text('Add Expense'),
+              ),
+            ],
+          ),
+        ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -109,10 +144,15 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
       monthlyExpenses[month - 1] += expense.amount;
     }
 
-    String formattedTotalAmount = NumberFormat.currency(
+    String formattedTotalMonthlyAmount = NumberFormat.currency(
       locale: 'en_PH',
       symbol: '₱',
     ).format(_totalMonthlyAmount);
+
+    String formattedTotalYearlyAmount = NumberFormat.currency(
+      locale: 'en_PH',
+      symbol: '₱',
+    ).format(_totalYearlyAmount);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -120,7 +160,17 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-            'Total Expenses this month: $formattedTotalAmount',
+            'Total Expenses this month: $formattedTotalMonthlyAmount',
+            style: const TextStyle(
+              fontSize: 24,
+              fontFamily: 'BebasNeue',
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            'Total Expenses this year: $formattedTotalYearlyAmount',
             style: const TextStyle(
               fontSize: 24,
               fontFamily: 'BebasNeue',
@@ -133,7 +183,9 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
             child: BarChart(
               BarChartData(
                 alignment: BarChartAlignment.spaceAround,
-                maxY: monthlyExpenses.reduce((value, element) => value > element ? value : element) * 1.5,
+                maxY: monthlyExpenses.reduce((value, element) =>
+                    value > element ? value : element) *
+                    1.5,
                 gridData: FlGridData(show: false),
                 titlesData: FlTitlesData(
                   bottomTitles: SideTitles(
@@ -145,19 +197,32 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                     ),
                     getTitles: (value) {
                       switch (value.toInt()) {
-                        case 0: return 'Jan';
-                        case 1: return 'Feb';
-                        case 2: return 'Mar';
-                        case 3: return 'Apr';
-                        case 4: return 'May';
-                        case 5: return 'Jun';
-                        case 6: return 'Jul';
-                        case 7: return 'Aug';
-                        case 8: return 'Sep';
-                        case 9: return 'Oct';
-                        case 10: return 'Nov';
-                        case 11: return 'Dec';
-                        default: return '';
+                        case 0:
+                          return 'Jan';
+                        case 1:
+                          return 'Feb';
+                        case 2:
+                          return 'Mar';
+                        case 3:
+                          return 'Apr';
+                        case 4:
+                          return 'May';
+                        case 5:
+                          return 'Jun';
+                        case 6:
+                          return 'Jul';
+                        case 7:
+                          return 'Aug';
+                        case 8:
+                          return 'Sep';
+                        case 9:
+                          return 'Oct';
+                        case 10:
+                          return 'Nov';
+                        case 11:
+                          return 'Dec';
+                        default:
+                          return '';
                       }
                     },
                   ),
@@ -211,13 +276,18 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   }
 
   Widget _buildExpensesTab() {
+    String formattedTotalExpensesAmount = NumberFormat.currency(
+      locale: 'en_PH',
+      symbol: '₱',
+    ).format(_totalExpensesAmount);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-            'Total Expenses this month: ₱${NumberFormat.currency(locale: 'en_PH', symbol: '').format(_totalMonthlyAmount)}',
+            'Total Expenses: $formattedTotalExpensesAmount',
             style: const TextStyle(
               fontSize: 24,
               fontFamily: 'BebasNeue',
@@ -283,7 +353,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
       _expenseBox.deleteAt(index);
       _fetchExpenses();
     } catch (e) {
-      print('Error deleting expense: $e');
+      print('Failed to delete expense: $e');
     }
   }
 
@@ -321,7 +391,8 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
               const SizedBox(height: 20),
               TextField(
                 controller: amountController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   labelText: 'Amount',
                   prefixText: '₱',
@@ -371,7 +442,8 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
             ),
             TextButton(
               onPressed: () {
-                if (selectedExpenseTitle == null || amountController.text.isEmpty) {
+                if (selectedExpenseTitle == null ||
+                    amountController.text.isEmpty) {
                   _showErrorDialog(context, 'Please fill in all fields.');
                   return;
                 }
@@ -422,11 +494,5 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
   }
 }
