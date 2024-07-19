@@ -5,9 +5,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'expense.dart';
 
 class MyHomePage extends StatefulWidget {
+  // ignore: use_super_parameters
   const MyHomePage({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _MyHomePageState createState() => _MyHomePageState();
 }
 
@@ -138,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage>
 }
 
 
-  Widget _buildHomeTab() {
+Widget _buildHomeTab() {
   List<double> monthlyExpenses = List.filled(12, 0.0);
 
   for (var expense in _expenses) {
@@ -186,8 +188,8 @@ class _MyHomePageState extends State<MyHomePage>
             BarChartData(
               alignment: BarChartAlignment.spaceAround,
               maxY: monthlyExpenses.reduce((value, element) =>
-                  value > element ? value : element) *
-                  1.5,
+                    value > element ? value : element) *
+                    1.5,
               gridData: FlGridData(show: false),
               titlesData: FlTitlesData(
                 bottomTitles: SideTitles(
@@ -229,7 +231,7 @@ class _MyHomePageState extends State<MyHomePage>
                   },
                 ),
                 leftTitles: SideTitles(
-                  showTitles: true,
+                  showTitles: false,
                   getTextStyles: (context, value) => TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -249,6 +251,78 @@ class _MyHomePageState extends State<MyHomePage>
                 ),
               ),
               barGroups: _generateBars(monthlyExpenses),
+              barTouchData: BarTouchData(
+                touchTooltipData: BarTouchTooltipData(
+                  tooltipBgColor: Colors.grey,
+                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                    // ignore: unused_local_variable
+                    String month;
+                    switch (group.x.toInt()) {
+                      case 0:
+                        month = 'Jan';
+                        break;
+                      case 1:
+                        month = 'Feb';
+                        break;
+                      case 2:
+                        month = 'Mar';
+                        break;
+                      case 3:
+                        month = 'Apr';
+                        break;
+                      case 4:
+                        month = 'May';
+                        break;
+                      case 5:
+                        month = 'Jun';
+                        break;
+                      case 6:
+                        month = 'Jul';
+                        break;
+                      case 7:
+                        month = 'Aug';
+                        break;
+                      case 8:
+                        month = 'Sept';
+                        break;
+                      case 9:
+                        month = 'Oct';
+                        break;
+                      case 10:
+                        month = 'Nov';
+                        break;
+                      case 11:
+                        month = 'Dec';
+                        break;
+                      default:
+                        throw Error();
+                    }
+                    // Format value to thousands
+      String formattedValue = rod.y >= 1000
+          ? '₱${(rod.y / 1000).toStringAsFixed(1)}k'
+          : rod.y.toString();
+                    return BarTooltipItem(
+                      '',
+                      const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                      children: <TextSpan>[
+          TextSpan(
+            // ignore: unnecessary_string_interpolations
+            text: '$formattedValue',
+            style: const TextStyle(
+              color: Color.fromARGB(255, 152, 230, 155),
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
             ),
           ),
         ),
@@ -256,6 +330,7 @@ class _MyHomePageState extends State<MyHomePage>
     ],
   );
 }
+
 
   List<BarChartGroupData> _generateBars(List<double> monthlyExpenses) {
     List<BarChartGroupData> bars = [];
@@ -268,7 +343,8 @@ class _MyHomePageState extends State<MyHomePage>
             BarChartRodData(
               y: monthlyExpenses[i],
               colors: [Colors.green],
-              width: 30,
+              borderRadius: const BorderRadius.all(Radius.zero),
+              width: 16,
             ),
           ],
           showingTooltipIndicators: [0],
@@ -324,39 +400,59 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 
-  void _confirmDeleteExpense(int index) async {
-    bool confirmDelete = await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirm Delete'),
-        content: const Text('Are you sure you want to delete this expense?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(true);
-            },
-            child: const Text('Delete'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
-            child: const Text('Cancel'),
-          ),
-        ],
-      ),
-    );
 
-    if (confirmDelete) {
-      _deleteExpense(index);
-    }
+void _confirmDeleteExpense(int index) async {
+  bool confirmDelete = await showDialog(
+    context: context,
+    builder: (context) {
+      return Theme(
+        data: isDarkMode ? ThemeData.dark() : ThemeData.light(),
+        child: AlertDialog(
+          title: Text(
+            'Confirm Delete',
+            style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+          ),
+          content: Text(
+            'Are you sure you want to delete this expense?',
+            style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text(
+                'Delete',
+                style: TextStyle(color: isDarkMode ? Colors.red : Colors.redAccent),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+
+  if (confirmDelete) {
+    _deleteExpense(index);
   }
+}
+
 
   void _deleteExpense(int index) {
     try {
       _expenseBox.deleteAt(index);
       _fetchExpenses();
     } catch (e) {
+      // ignore: avoid_print
       print('Failed to delete expense: $e');
     }
   }
@@ -395,7 +491,7 @@ class _MyHomePageState extends State<MyHomePage>
                 decoration: InputDecoration(
                   labelText: 'Expenses',
                   labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: isDarkMode ? Colors.white : Colors.black),
                   ),
@@ -404,17 +500,17 @@ class _MyHomePageState extends State<MyHomePage>
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextField(
                 controller: amountController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                 decoration: InputDecoration(
                   labelText: 'Amount',
                   prefixText: '₱',
                   labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                   prefixStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: isDarkMode ? Colors.white : Colors.black),
                   ),
@@ -423,7 +519,7 @@ class _MyHomePageState extends State<MyHomePage>
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               InkWell(
                 onTap: () async {
                   final DateTime? pickedDate = await showDatePicker(
@@ -450,12 +546,12 @@ class _MyHomePageState extends State<MyHomePage>
                     border: Border.all(color: isDarkMode ? Colors.white : Colors.black),
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   alignment: Alignment.centerLeft,
                   child: Row(
                     children: [
                       Icon(Icons.calendar_today, color: isDarkMode ? Colors.white : Colors.black),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Text(
                         DateFormat('dd-MM-yyyy').format(selectedDate),
                         style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
